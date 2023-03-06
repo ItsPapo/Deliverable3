@@ -30,7 +30,7 @@ public class GroupOfCards {
      *
      * @return the group of cards.
      */
-    public ArrayList<Card> getCards() {
+    public ArrayList<Card>  getCards() {
         return cards;
     }
 
