@@ -1,58 +1,81 @@
-/**
- * SYST 17796 Project Base code.
- * Students can modify and extend to implement their game.
- * Add your name as an author and the date!
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
 package ca.sheridancollege.project;
 
-import java.util.ArrayList;
-
 /**
- * The class that models your game. You should create a more specific child of this class and instantiate the methods
- * given.
  *
- * @author dancye
- * @author Paul Bonenfant Jan 2020
+ * @author rodio
  */
-public abstract class Game {
 
-    private final String name;//the title of the game
-    private ArrayList<Player> players;// the players of the game
 
-    public Game(String name) {
-        this.name = name;
-        players = new ArrayList();
+import java.util.Scanner;
+
+public class Game {
+    public static void main(String[] args) throws Exception {
+        System.out.println("Please enter your name to play!");
+        Scanner input = new Scanner(System.in);
+        String playerName = input.nextLine();
+        Dealer dealer = new Dealer();
+        Player player = new Player(playerName);
+        System.out.println("Welcome to the Java Blackjack table!");
+        outer:
+        while (true) {
+            System.out.println(" ");
+            System.out.println("Enter: (play) to Play");
+            System.out.println("Enter: (anything else) to Quit");
+            if (!input.nextLine().trim().toLowerCase().equals("play")) {
+                break;
+            }
+            System.out.println("New game started!");
+            dealer.initializeHands(player);
+            dealer.displayHiddenHand();
+            player.displayHand();
+            while (true) {
+                System.out.println(" ");
+                System.out.println(player.getName() + ", enter your decision:");
+                System.out.println("(stand) to Stand");
+                System.out.println("(anything else) to Hit");
+                if (input.nextLine().trim().toLowerCase().equals("stand")) {
+                    break;
+                }
+                dealer.issueCard(player);
+                player.displayHand();
+                if (player.getHandValue() > 21) {
+                    System.out.println(player.getName() + " is busted (exceeded 21 point)");
+                    determineWinner(player, dealer);
+                    continue outer;
+                }
+            }
+            System.out.println("\n***********");
+            dealer.displayHand();
+            System.out.println("Dealer is playing");
+            dealer.dealerPlays();
+            determineWinner(player, dealer);
+        }
+        System.out.println(playerName + "'s wins: " + player.getWins());
+        System.out.println("Dealer's wins: " + dealer.getWins());
+        input.close();
     }
 
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
+    public static void determineWinner(Player p, Player d) {
+        int pHandValue = p.getHandValue();
+        int dHandValue = d.getHandValue();
+        if ((pHandValue > dHandValue && (p.getHandValue() <= 21)) || d.getHandValue() > 21) {
+            System.out.println(p.getName() + " wins! Final score is " + p.getHandValue());
+            p.setWins((p.getWins() + 1));
+
+        } else if (pHandValue == dHandValue) {
+            System.out.println("Draft!");
+        } else {
+            System.out.println("Dealer Wins!");
+            d.setWins((d.getWins() + 1));
+        }
+        System.out.println(p.getName() + "'s score = " + pHandValue + ", and Dealer's Score = " + dHandValue);
+        p.reset();
+        d.reset();
     }
+    
+}
 
-    /**
-     * @return the players of this game
-     */
-    public ArrayList<Player> getPlayers() {
-        return players;
-    }
-
-    /**
-     * @param players the players of this game
-     */
-    public void setPlayers(ArrayList<Player> players) {
-        this.players = players;
-    }
-
-    /**
-     * Play the game. This might be one method or many method calls depending on your game.
-     */
-    public abstract void play();
-
-    /**
-     * When the game is over, use this method to declare and display a winning player.
-     */
-    public abstract void declareWinner();
-
-}//end class
